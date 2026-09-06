@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+
+# Environment Variables (CRITICAL)
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Database files & IDEs
+*.sqlite
+.vscode/
+.idea/
+.DS_Store
+
+
+logs/
+*.log

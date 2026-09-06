@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  passwordHash      String     @map("password_hash")
+  fullName          String     @map("full_name")
+  subcontractorName String?    @map("subcontractor_name")
+  businessName      String?    @default("Velocity Taxi Trucks") @map("business_name")
+  rego              String?
+  yardLocation      String?    @map("yard_location")
+  role              Role       @default(DRIVER)
+  isActive          Boolean    @default(true) @map("is_active")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  auditLogs         AuditLog[]
+  runsheets         Runsheet[]
+
+  @@map("users")
+}
+
+model Runsheet {
+  id                String        @id @default(uuid())
+  driverId          String        @map("driver_id")
+  shiftDate         DateTime      @map("shift_date") @db.Date
+  odometerStart     Decimal       @map("odometer_start") @db.Decimal(10, 2)
+  odometerFinish    Decimal?      @map("odometer_finish") @db.Decimal(10, 2)
+  totalDistance     Decimal?      @map("total_distance") @db.Decimal(10, 2)
+  originYard        String        @map("origin_yard")
+  startTime         String        @map("start_time")
+  endTime           String?       @map("end_time")
+  depotEndLocation  String?       @map("depot_end_location")
+  firstArrival      String?       @map("first_arrival")
+  travelTime        String?       @map("travel_time")
+  finalDepart       String?       @map("final_depart")
+  lastEndTime       String?       @map("last_end_time")
+  returnTime        String?       @map("return_time")
+  break1            String?       @map("break_1")
+  break2            String?       @map("break_2")
+  break3            String?       @map("break_3")
+  break4            String?       @map("break_4")
+  comments          String?
+  signatureUrl      String?       @map("signature_url")
+  status            ShiftStatus   @default(DRAFT)
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  businessName      String?       @map("business_name")
+  rego              String?
+  subcontractorName String?       @map("subcontractor_name")
+  yardLocation      String?       @map("yard_location")
+  legs              RunsheetLeg[]
+  driver            User          @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([driverId, shiftDate])
+  @@index([status])
+  @@map("runsheets")
+}
+
+model RunsheetLeg {
+  id                String   @id @default(uuid())
+  runsheetId        String   @map("runsheet_id")
+  legOrder          Int      @map("leg_order")
+  type              LegType
+  arrivalTime       String   @map("arrival_time")
+  departureTime     String   @map("departure_time")
+  authorisedPerson  String?  @map("authorised_person")
+  itemCount         Int      @default(1) @map("item_count")
+  itemDescription   String?  @map("item_description")
+  tollUsed          Boolean  @default(false) @map("toll_used")
+  tollAmount        Decimal? @default(0.00) @map("toll_amount") @db.Decimal(8, 2)
+  createdAt         DateTime @default(now()) @map("created_at")
+  collectionCompany String?  @map("collection_company")
+  collectionSuburb  String?  @map("collection_suburb")
+  deliveryCompany   String?  @map("delivery_company")
+  deliverySuburb    String?  @map("delivery_suburb")
+  notes             String?
+  tollAuthorizedBy  String?  @map("toll_authorized_by")
+  runsheet          Runsheet @relation(fields: [runsheetId], references: [id], onDelete: Cascade)
+
+  @@index([runsheetId])
+  @@index([collectionCompany])
+  @@index([deliveryCompany])
+  @@map("runsheet_legs")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  resource  String
+  payload   Json?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum Role {
+  DRIVER
+  ADMIN
+}
+
+enum ShiftStatus {
+  DRAFT
+  COMPLETED
+}
+
+enum LegType {
+  PICKUP
+  DELIVERY
+}
