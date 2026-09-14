@@ -28,36 +28,55 @@ model User {
 }
 
 model Runsheet {
-  id                String        @id @default(uuid())
-  driverId          String        @map("driver_id")
-  shiftDate         DateTime      @map("shift_date") @db.Date
-  odometerStart     Decimal       @map("odometer_start") @db.Decimal(10, 2)
-  odometerFinish    Decimal?      @map("odometer_finish") @db.Decimal(10, 2)
-  totalDistance     Decimal?      @map("total_distance") @db.Decimal(10, 2)
-  originYard        String        @map("origin_yard")
-  startTime         String        @map("start_time")
-  endTime           String?       @map("end_time")
-  depotEndLocation  String?       @map("depot_end_location")
-  firstArrival      String?       @map("first_arrival")
-  travelTime        String?       @map("travel_time")
-  finalDepart       String?       @map("final_depart")
-  lastEndTime       String?       @map("last_end_time")
-  returnTime        String?       @map("return_time")
-  break1            String?       @map("break_1")
-  break2            String?       @map("break_2")
-  break3            String?       @map("break_3")
-  break4            String?       @map("break_4")
-  comments          String?
-  signatureUrl      String?       @map("signature_url")
-  status            ShiftStatus   @default(DRAFT)
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
-  businessName      String?       @map("business_name")
-  rego              String?
-  subcontractorName String?       @map("subcontractor_name")
-  yardLocation      String?       @map("yard_location")
-  legs              RunsheetLeg[]
-  driver            User          @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  id                    String        @id @default(uuid())
+  driverId              String        @map("driver_id")
+  shiftDate             DateTime      @map("shift_date") @db.Date
+  odometerStart         Decimal       @map("odometer_start") @db.Decimal(10, 2)
+  odometerFinish        Decimal?      @map("odometer_finish") @db.Decimal(10, 2)
+  totalDistance         Decimal?      @map("total_distance") @db.Decimal(10, 2)
+  originYard            String        @map("origin_yard")
+  startTime             String        @map("start_time")
+  endTime               String?       @map("end_time")
+  depotEndLocation      String?       @map("depot_end_location")
+
+  // Break 1
+  break1StartTime       String?       @map("break_1_start_time")
+  break1Duration        Int?          @default(15) @map("break_1_duration")
+  break1EndTime         String?       @map("break_1_end_time")
+
+  // Break 2
+  break2StartTime       String?       @map("break_2_start_time")
+  break2Duration        Int?          @default(30) @map("break_2_duration")
+  break2EndTime         String?       @map("break_2_end_time")
+
+  // Break 3
+  break3StartTime       String?       @map("break_3_start_time")
+  break3Duration        Int?          @default(15) @map("break_3_duration")
+  break3EndTime         String?       @map("break_3_end_time")
+
+  // Break 4
+  break4StartTime       String?       @map("break_4_start_time")
+  break4Duration        Int?          @default(15) @map("break_4_duration")
+  break4EndTime         String?       @map("break_4_end_time")
+
+  // Travel and Closure Timings
+  firstArrivalTime      String?       @map("first_arrival_time")
+  travelTimeDuration    String?       @map("travel_time_duration")
+  finalDepartTime       String?       @map("final_depart_time")
+  lastEndTime           String?       @map("last_end_time")
+  returnTime            String?       @map("return_time")
+
+  comments              String?
+  signatureUrl          String?       @map("signature_url")
+  status                ShiftStatus   @default(DRAFT)
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+  businessName          String?       @map("business_name")
+  rego                  String?
+  subcontractorName     String?       @map("subcontractor_name")
+  yardLocation          String?       @map("yard_location")
+  legs                  RunsheetLeg[]
+  driver                User          @relation(fields: [driverId], references: [id], onDelete: Cascade)
 
   @@index([driverId, shiftDate])
   @@index([status])

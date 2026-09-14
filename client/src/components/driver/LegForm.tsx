@@ -66,9 +66,9 @@ export default function LegForm({ initialValues, onAdd, onCancelEdit }: LegFormP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (leg.type === 'PICKUP') {
-      if (!leg.collectionCompany.trim() || !leg.collectionSuburb.trim()) return;
+      if (!leg.collectionCompany?.trim() || !leg.collectionSuburb?.trim()) return;
     } else if (leg.type === 'DELIVERY') {
-      if (!leg.deliveryCompany.trim() || !leg.deliverySuburb.trim()) return;
+      if (!leg.deliveryCompany?.trim() || !leg.deliverySuburb?.trim()) return;
     }
     onAdd({
       ...leg,
@@ -138,7 +138,7 @@ export default function LegForm({ initialValues, onAdd, onCancelEdit }: LegFormP
                 Building2,
                 <input
                   type="text"
-                  value={leg.collectionCompany}
+                  value={leg.collectionCompany ?? ''}
                   onChange={(e) => update('collectionCompany', e.target.value)}
                   className={`${ui.input} pl-10`}
                   required
@@ -151,7 +151,7 @@ export default function LegForm({ initialValues, onAdd, onCancelEdit }: LegFormP
                 MapPin,
                 <input
                   type="text"
-                  value={leg.collectionSuburb}
+                  value={leg.collectionSuburb ?? ''}
                   onChange={(e) => update('collectionSuburb', e.target.value)}
                   className={`${ui.input} pl-10`}
                   required
@@ -169,7 +169,7 @@ export default function LegForm({ initialValues, onAdd, onCancelEdit }: LegFormP
                 Building2,
                 <input
                   type="text"
-                  value={leg.deliveryCompany}
+                  value={leg.deliveryCompany ?? ''}
                   onChange={(e) => update('deliveryCompany', e.target.value)}
                   className={`${ui.input} pl-10`}
                   required
@@ -182,7 +182,7 @@ export default function LegForm({ initialValues, onAdd, onCancelEdit }: LegFormP
                 MapPin,
                 <input
                   type="text"
-                  value={leg.deliverySuburb}
+                  value={leg.deliverySuburb ?? ''}
                   onChange={(e) => update('deliverySuburb', e.target.value)}
                   className={`${ui.input} pl-10`}
                   required

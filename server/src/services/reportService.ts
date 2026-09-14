@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { Prisma } from '@prisma/client';
 import { prisma, runsheetInclude, type RunsheetWithDetails } from '../lib/prisma.js';
+import {
+  computeBreakEndTime,
+  formatBreakInterval,
+} from '../utils/timeCalculations.js';
 
 export interface RunsheetFilters {
   driverId?: string;
@@ -434,31 +438,26 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       React.createElement(Text, { style: styles.valueCell }, value || '')
     );
 
-  const breaksTable = React.createElement(
-    View,
-    { style: styles.blockTable },
-    React.createElement(
-      View,
-      { style: styles.tr },
-      React.createElement(Text, { style: [styles.labelCell, styles.blockHeader, { borderBottomWidth: 1 }] }, 'Breaks'),
-      React.createElement(Text, { style: [styles.valueCell, styles.blockHeader] }, 'TIME (Start & Finish)')
-    ),
-    breakRow('First Break', runsheet.break1 || ''),
-    breakRow('Second Break', runsheet.break2 || ''),
-    breakRow('Third Break', runsheet.break3 || ''),
-    breakRow('Fourth Break', runsheet.break4 || '')
-  );
+  const breakDisplay = (
+    startKey: string,
+    durationKey: string,
+    endKey: string
+  ): string => {
+    const start = runsheet[startKey] as string | undefined | null;
+    const duration = runsheet[durationKey] as number | undefined | null;
+    const storedEnd = runsheet[endKey] as string | undefined | null;
+    const end = storedEnd || (start && duration ? computeBreakEndTime(start, duration) : '');
+    return formatBreakInterval(start, duration, end);
+  };
 
-  const travelTable = React.createElement(
+  const breakDetailsTable = React.createElement(
     View,
     { style: styles.blockTable },
-    React.createElement(Text, { style: styles.blockHeader }, 'Travel Time & Odometers'),
-    breakRow('Travel Time (If Any)', runsheet.travelTime || ''),
-    breakRow('First Arrival', runsheet.firstArrival || ''),
-    breakRow('Final Depart', runsheet.finalDepart || ''),
-    breakRow('Return Time', runsheet.returnTime || ''),
-    breakRow('ODOMETER START', formatNumber(runsheet.odometerStart)),
-    breakRow('ODOMETER FINISH', formatNumber(runsheet.odometerFinish))
+    React.createElement(Text, { style: styles.blockHeader }, 'Break Details'),
+    breakRow('First Break', breakDisplay('break1StartTime', 'break1Duration', 'break1EndTime')),
+    breakRow('Second Break', breakDisplay('break2StartTime', 'break2Duration', 'break2EndTime')),
+    breakRow('Third Break', breakDisplay('break3StartTime', 'break3Duration', 'break3EndTime')),
+    breakRow('Fourth Break', breakDisplay('break4StartTime', 'break4Duration', 'break4EndTime'))
   );
 
   const guidelineBox = React.createElement(
@@ -470,11 +469,20 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
     React.createElement(Text, { style: styles.guidelineText }, '60 Minutes break within first 11 Hours moving Time')
   );
 
-  const middleBlock = React.createElement(
+  const travelTimeTable = React.createElement(
     View,
-    { style: styles.middleRow },
-    React.createElement(View, { style: styles.halfColLeft }, breaksTable),
-    React.createElement(View, { style: styles.halfCol }, travelTable, guidelineBox)
+    { style: styles.blockTable },
+    React.createElement(Text, { style: styles.blockHeader }, 'Travel Time Details'),
+    breakRow('First Arrival', runsheet.firstArrivalTime || ''),
+    breakRow('Travel Time', runsheet.travelTimeDuration || ''),
+    breakRow('Final Depart', runsheet.finalDepartTime || ''),
+    breakRow('Last End Time', runsheet.lastEndTime || ''),
+    breakRow('Return Time', runsheet.returnTime || ''),
+    breakRow('End Time', runsheet.endTime || ''),
+    breakRow('Depot End Location', runsheet.depotEndLocation || ''),
+    breakRow('ODOMETER START', formatNumber(runsheet.odometerStart)),
+    breakRow('ODOMETER FINISH', formatNumber(runsheet.odometerFinish)),
+    breakRow('TOTAL DISTANCE', formatNumber(runsheet.totalDistance))
   );
 
   const contractorCell = (label: string, value: string, isLastRow = false) =>
@@ -532,8 +540,10 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
         React.createElement(Text, { style: styles.title }, 'VELOCITY TAXI TRUCKS - DAILY RUNSHEET')
       ),
       React.createElement(View, { style: styles.table }, tableHeader, ...legRows),
-      middleBlock,
-      contractorGrid,
+      React.createElement(View, { style: { marginTop: 6 } }, breakDetailsTable),
+      React.createElement(View, { style: { marginTop: 4 } }, guidelineBox),
+      React.createElement(View, { style: { marginTop: 6 } }, contractorGrid),
+      React.createElement(View, { style: { marginTop: 6 } }, travelTimeTable),
       signatureRow,
       commentsBox
     )

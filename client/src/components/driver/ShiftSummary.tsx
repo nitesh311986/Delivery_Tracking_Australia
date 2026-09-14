@@ -26,7 +26,7 @@ export default function ShiftSummary({
 }: ShiftSummaryProps) {
   const { resolved } = useTheme();
   const sigRef = useRef<SignatureCanvas | null>(null);
-  const [strokeHistory, setStrokeHistory] = useState<PointGroup[]>([]);
+  const [_strokeHistory, setStrokeHistory] = useState<PointGroup[]>([]);
 
   const finish = Number(value.odometerFinish);
   const distance =
