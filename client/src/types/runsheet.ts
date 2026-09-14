@@ -26,15 +26,28 @@ export interface Runsheet {
   startTime: string;
   endTime: string | null;
   depotEndLocation: string | null;
-  firstArrival: string | null;
-  travelTime: string | null;
-  finalDepart: string | null;
+
+  // Breaks
+  break1StartTime: string | null;
+  break1Duration: number | null;
+  break1EndTime: string | null;
+  break2StartTime: string | null;
+  break2Duration: number | null;
+  break2EndTime: string | null;
+  break3StartTime: string | null;
+  break3Duration: number | null;
+  break3EndTime: string | null;
+  break4StartTime: string | null;
+  break4Duration: number | null;
+  break4EndTime: string | null;
+
+  // Travel and Closure Timings
+  firstArrivalTime: string | null;
+  travelTimeDuration: string | null;
+  finalDepartTime: string | null;
   lastEndTime: string | null;
   returnTime: string | null;
-  break1: string | null;
-  break2: string | null;
-  break3: string | null;
-  break4: string | null;
+
   comments: string | null;
   signatureUrl: string | null;
   subcontractorName: string | null;
@@ -123,15 +136,28 @@ export interface CompleteRunsheetRequest {
   odometerFinish: number;
   endTime: string;
   depotEndLocation: string;
-  firstArrival?: string;
-  travelTime?: string;
-  finalDepart?: string;
+
+  // Breaks
+  break1StartTime?: string;
+  break1Duration?: number;
+  break1EndTime?: string;
+  break2StartTime?: string;
+  break2Duration?: number;
+  break2EndTime?: string;
+  break3StartTime?: string;
+  break3Duration?: number;
+  break3EndTime?: string;
+  break4StartTime?: string;
+  break4Duration?: number;
+  break4EndTime?: string;
+
+  // Travel and Closure Timings
+  firstArrivalTime?: string;
+  travelTimeDuration?: string;
+  finalDepartTime?: string;
   lastEndTime?: string;
   returnTime?: string;
-  break1?: string;
-  break2?: string;
-  break3?: string;
-  break4?: string;
+
   comments?: string;
   signatureUrl: string;
   subcontractorName?: string;

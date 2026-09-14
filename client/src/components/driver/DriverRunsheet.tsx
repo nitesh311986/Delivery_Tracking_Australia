@@ -13,8 +13,9 @@ import { addLeg, completeRunsheet, createRunsheet, extractApiError } from '../..
 import ShiftHeader from './ShiftHeader';
 import LegForm, { type DraftLeg } from './LegForm';
 import LegTable from './LegTable';
-import BreaksTravelTime from './BreaksTravelTime';
+import BreakDetails from './BreakDetails';
 import GeneralDetails from './GeneralDetails';
+import TravelTimeDetails from './TravelTimeDetails';
 import ShiftSummary from './ShiftSummary';
 import DriverHistory from './DriverHistory';
 import DriverSummary from './DriverSummary';
@@ -40,6 +41,25 @@ const getDefaultSummary = (
   subcontractorName: user?.subcontractorName ?? '',
   rego: user?.rego ?? '',
   businessName: user?.businessName ?? '',
+
+  break1StartTime: '',
+  break1Duration: 15,
+  break1EndTime: '',
+  break2StartTime: '',
+  break2Duration: 30,
+  break2EndTime: '',
+  break3StartTime: '',
+  break3Duration: 15,
+  break3EndTime: '',
+  break4StartTime: '',
+  break4Duration: 15,
+  break4EndTime: '',
+
+  firstArrivalTime: '',
+  travelTimeDuration: '',
+  finalDepartTime: '',
+  lastEndTime: '',
+  returnTime: '',
 });
 
 function toCreateLegRequest(leg: DraftLeg, legOrder: number): CreateLegRequest {
@@ -348,12 +368,7 @@ export default function DriverRunsheet() {
 
           <LegTable legs={legs} onDelete={handleDeleteLeg} onEdit={handleEditLeg} />
 
-          <BreaksTravelTime
-            value={summary}
-            legs={legs}
-            startTime={shift.startTime}
-            onChange={handleSummaryChange}
-          />
+          <BreakDetails value={summary} onChange={handleSummaryChange} />
 
           <GeneralDetails value={summary} onChange={handleSummaryChange} />
 
@@ -370,15 +385,23 @@ export default function DriverRunsheet() {
           )}
 
           {wrapUpVisible && (
-            <ShiftSummary
-              key={summaryKey}
-              odometerStart={startOdometer}
-              value={summary}
-              onChange={(next) => setSummary((prev) => ({ ...prev, ...next }))}
-              onSave={handleSave}
-              canSave={canSave}
-              loading={loading}
-            />
+            <>
+              <TravelTimeDetails
+                value={summary}
+                legs={legs}
+                startTime={shift.startTime}
+                onChange={(next) => setSummary((prev) => ({ ...prev, ...next }))}
+              />
+              <ShiftSummary
+                key={summaryKey}
+                odometerStart={startOdometer}
+                value={summary}
+                onChange={(next) => setSummary((prev) => ({ ...prev, ...next }))}
+                onSave={handleSave}
+                canSave={canSave}
+                loading={loading}
+              />
+            </>
           )}
         </div>
       )}

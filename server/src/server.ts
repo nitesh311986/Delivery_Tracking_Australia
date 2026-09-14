@@ -105,7 +105,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'https://delivery-tracking-australia.vercel.app',
-  process.env.CLIENT_URL,
+  //process.env.CLIENT_URL,
 ].filter(Boolean) as string[];
 
 app.use(cors({
