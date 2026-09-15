@@ -76,7 +76,7 @@ export default function ShiftSummary({
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           End of Shift Wrap-up
         </h2>
-        <p className={ui.subtitle}>Final odometer, timing and comments.</p>
+        <p className={ui.subtitle}>Final odometer, depot location and comments.</p>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
@@ -102,16 +102,6 @@ export default function ShiftSummary({
               type="text"
               value={value.depotEndLocation}
               onChange={(e) => update('depotEndLocation', e.target.value)}
-              className={ui.input}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className={ui.label}>End Time</label>
-            <input
-              type="time"
-              value={value.endTime}
-              onChange={(e) => update('endTime', e.target.value)}
               className={ui.input}
             />
           </div>

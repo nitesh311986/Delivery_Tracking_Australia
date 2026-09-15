@@ -48,26 +48,18 @@ export const createLegSchema = z
 
 export const completeRunsheetSchema = z.object({
   odometerFinish: z.number().min(0),
-  endTime: z.string().min(1),
   depotEndLocation: z.string().min(1),
 
-  break1StartTime: z.string().optional(),
-  break1Duration: z.coerce.number().int().min(0).optional(),
-  break1EndTime: z.string().optional(),
-  break2StartTime: z.string().optional(),
-  break2Duration: z.coerce.number().int().min(0).optional(),
-  break2EndTime: z.string().optional(),
-  break3StartTime: z.string().optional(),
-  break3Duration: z.coerce.number().int().min(0).optional(),
-  break3EndTime: z.string().optional(),
-  break4StartTime: z.string().optional(),
-  break4Duration: z.coerce.number().int().min(0).optional(),
-  break4EndTime: z.string().optional(),
+  // Breaks stored as JSON strings
+  break1: z.string().optional(),
+  break2: z.string().optional(),
+  break3: z.string().optional(),
+  break4: z.string().optional(),
 
+  // Travel and Closure Timings
   firstArrivalTime: z.string().optional(),
   travelTimeDuration: z.string().optional(),
   finalDepartTime: z.string().optional(),
-  lastEndTime: z.string().optional(),
   returnTime: z.string().optional(),
 
   comments: z.string().optional(),

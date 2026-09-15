@@ -5,6 +5,7 @@ export type LegType = 'PICKUP' | 'DELIVERY';
 export interface User {
   id: string;
   email: string;
+  passwordHash: string;
   fullName: string;
   subcontractorName: string | null;
   businessName: string | null;
@@ -27,25 +28,16 @@ export interface Runsheet {
   endTime: string | null;
   depotEndLocation: string | null;
 
-  // Breaks
-  break1StartTime: string | null;
-  break1Duration: number | null;
-  break1EndTime: string | null;
-  break2StartTime: string | null;
-  break2Duration: number | null;
-  break2EndTime: string | null;
-  break3StartTime: string | null;
-  break3Duration: number | null;
-  break3EndTime: string | null;
-  break4StartTime: string | null;
-  break4Duration: number | null;
-  break4EndTime: string | null;
+  // Breaks stored as JSON strings
+  break1: string | null;
+  break2: string | null;
+  break3: string | null;
+  break4: string | null;
 
   // Travel and Closure Timings
   firstArrivalTime: string | null;
   travelTimeDuration: string | null;
   finalDepartTime: string | null;
-  lastEndTime: string | null;
   returnTime: string | null;
 
   comments: string | null;
@@ -96,7 +88,6 @@ export interface AuditLog {
 
 export interface AuthenticatedUser {
   id: string;
-  email: string;
   role: Role;
 }
 
@@ -132,30 +123,26 @@ export interface CreateLegRequest {
   tollAuthorizedBy?: string;
 }
 
+export interface BreakSlot {
+  startTime: string;
+  duration: number;
+  endTime: string;
+}
+
 export interface CompleteRunsheetRequest {
   odometerFinish: number;
-  endTime: string;
   depotEndLocation: string;
 
-  // Breaks
-  break1StartTime?: string;
-  break1Duration?: number;
-  break1EndTime?: string;
-  break2StartTime?: string;
-  break2Duration?: number;
-  break2EndTime?: string;
-  break3StartTime?: string;
-  break3Duration?: number;
-  break3EndTime?: string;
-  break4StartTime?: string;
-  break4Duration?: number;
-  break4EndTime?: string;
+  // Breaks stored as JSON strings
+  break1?: string;
+  break2?: string;
+  break3?: string;
+  break4?: string;
 
   // Travel and Closure Timings
   firstArrivalTime?: string;
   travelTimeDuration?: string;
   finalDepartTime?: string;
-  lastEndTime?: string;
   returnTime?: string;
 
   comments?: string;

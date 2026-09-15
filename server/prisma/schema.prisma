@@ -39,31 +39,16 @@ model Runsheet {
   endTime               String?       @map("end_time")
   depotEndLocation      String?       @map("depot_end_location")
 
-  // Break 1
-  break1StartTime       String?       @map("break_1_start_time")
-  break1Duration        Int?          @default(15) @map("break_1_duration")
-  break1EndTime         String?       @map("break_1_end_time")
-
-  // Break 2
-  break2StartTime       String?       @map("break_2_start_time")
-  break2Duration        Int?          @default(30) @map("break_2_duration")
-  break2EndTime         String?       @map("break_2_end_time")
-
-  // Break 3
-  break3StartTime       String?       @map("break_3_start_time")
-  break3Duration        Int?          @default(15) @map("break_3_duration")
-  break3EndTime         String?       @map("break_3_end_time")
-
-  // Break 4
-  break4StartTime       String?       @map("break_4_start_time")
-  break4Duration        Int?          @default(15) @map("break_4_duration")
-  break4EndTime         String?       @map("break_4_end_time")
+  // Breaks stored as structured JSON strings
+  break1                String?
+  break2                String?
+  break3                String?
+  break4                String?
 
   // Travel and Closure Timings
   firstArrivalTime      String?       @map("first_arrival_time")
   travelTimeDuration    String?       @map("travel_time_duration")
   finalDepartTime       String?       @map("final_depart_time")
-  lastEndTime           String?       @map("last_end_time")
   returnTime            String?       @map("return_time")
 
   comments              String?

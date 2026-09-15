@@ -34,7 +34,6 @@ const getDefaultSummary = (
   user: ReturnType<typeof useAuth>['user']
 ): CompleteRunsheetRequest => ({
   odometerFinish: Number.NaN,
-  endTime: '',
   depotEndLocation: '',
   signatureUrl: '',
   yardLocation: user?.yardLocation ?? '',
@@ -42,23 +41,9 @@ const getDefaultSummary = (
   rego: user?.rego ?? '',
   businessName: user?.businessName ?? '',
 
-  break1StartTime: '',
-  break1Duration: 15,
-  break1EndTime: '',
-  break2StartTime: '',
-  break2Duration: 30,
-  break2EndTime: '',
-  break3StartTime: '',
-  break3Duration: 15,
-  break3EndTime: '',
-  break4StartTime: '',
-  break4Duration: 15,
-  break4EndTime: '',
-
   firstArrivalTime: '',
   travelTimeDuration: '',
   finalDepartTime: '',
-  lastEndTime: '',
   returnTime: '',
 });
 
@@ -257,13 +242,6 @@ export default function DriverRunsheet() {
         setLoading(false);
         return;
       }
-      if (!summary.endTime) {
-        const message = 'End time is required.';
-        setError(message);
-        toast.error(message);
-        setLoading(false);
-        return;
-      }
       if (!summary.depotEndLocation.trim()) {
         const message = 'Depot end location is required.';
         setError(message);
@@ -304,7 +282,6 @@ export default function DriverRunsheet() {
   const canSave =
     legs.length > 0 &&
     !Number.isNaN(summary.odometerFinish) &&
-    summary.endTime !== '' &&
     summary.depotEndLocation.trim() !== '' &&
     summary.yardLocation.trim() !== '' &&
     summary.signatureUrl !== '';
@@ -389,7 +366,6 @@ export default function DriverRunsheet() {
               <TravelTimeDetails
                 value={summary}
                 legs={legs}
-                startTime={shift.startTime}
                 onChange={(next) => setSummary((prev) => ({ ...prev, ...next }))}
               />
               <ShiftSummary

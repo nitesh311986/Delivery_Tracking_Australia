@@ -4,6 +4,7 @@ import { prisma, runsheetInclude, type RunsheetWithDetails } from '../lib/prisma
 import {
   computeBreakEndTime,
   formatBreakInterval,
+  computeTravelTime,
 } from '../utils/timeCalculations.js';
 
 export interface RunsheetFilters {
@@ -303,9 +304,6 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       minHeight: 14,
     },
     tdLast: { borderRightWidth: 0 },
-    middleRow: { flexDirection: 'row', marginTop: 6 },
-    halfCol: { width: '50%' },
-    halfColLeft: { width: '50%', marginRight: 4 },
     blockTable: { width: '100%', borderWidth: 1, borderColor: '#000000' },
     blockHeader: {
       fontFamily: 'Helvetica-Bold',
@@ -363,6 +361,32 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
     commentBox: { borderWidth: 1, borderTopWidth: 0, borderColor: '#000000', padding: 4, minHeight: 45 },
     commentLabel: { fontFamily: 'Helvetica-Bold', fontSize: 8, marginBottom: 2 },
     commentText: { fontSize: 8 },
+    travelTimeContainer: {
+      borderWidth: 1,
+      borderColor: '#000000',
+      marginTop: 12,
+      marginBottom: 12,
+      marginHorizontal: 8,
+    },
+    travelTimeBody: { flexDirection: 'row' },
+    travelTimeColumn: { width: '50%' },
+    travelTimeLeftColumn: { width: '50%', borderRightWidth: 1, borderColor: '#000000' },
+    travelTimeRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000000' },
+    travelTimeLastRow: { flexDirection: 'row' },
+    travelTimeLabel: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 8,
+      borderRightWidth: 1,
+      borderColor: '#000000',
+      padding: 4,
+      width: '45%',
+    },
+    travelTimeValue: {
+      fontSize: 8,
+      padding: 4,
+      width: '55%',
+      minHeight: 14,
+    },
   });
 
   const columns = [
@@ -438,26 +462,32 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       React.createElement(Text, { style: styles.valueCell }, value || '')
     );
 
-  const breakDisplay = (
-    startKey: string,
-    durationKey: string,
-    endKey: string
-  ): string => {
-    const start = runsheet[startKey] as string | undefined | null;
-    const duration = runsheet[durationKey] as number | undefined | null;
-    const storedEnd = runsheet[endKey] as string | undefined | null;
-    const end = storedEnd || (start && duration ? computeBreakEndTime(start, duration) : '');
-    return formatBreakInterval(start, duration, end);
+  const parseBreakSlot = (raw: string | undefined | null): { startTime?: string; duration?: number; endTime?: string } | null => {
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch {
+      // ignore invalid JSON
+    }
+    return null;
+  };
+
+  const formatBreakSlot = (raw: string | undefined | null): string => {
+    const b = parseBreakSlot(raw);
+    if (!b) return '';
+    const end = b.endTime || (b.startTime && b.duration ? computeBreakEndTime(b.startTime, b.duration) : '');
+    return formatBreakInterval(b.startTime, b.duration, end);
   };
 
   const breakDetailsTable = React.createElement(
     View,
     { style: styles.blockTable },
     React.createElement(Text, { style: styles.blockHeader }, 'Break Details'),
-    breakRow('First Break', breakDisplay('break1StartTime', 'break1Duration', 'break1EndTime')),
-    breakRow('Second Break', breakDisplay('break2StartTime', 'break2Duration', 'break2EndTime')),
-    breakRow('Third Break', breakDisplay('break3StartTime', 'break3Duration', 'break3EndTime')),
-    breakRow('Fourth Break', breakDisplay('break4StartTime', 'break4Duration', 'break4EndTime'))
+    breakRow('First Break', formatBreakSlot(runsheet.break1)),
+    breakRow('Second Break', formatBreakSlot(runsheet.break2)),
+    breakRow('Third Break', formatBreakSlot(runsheet.break3)),
+    breakRow('Fourth Break', formatBreakSlot(runsheet.break4))
   );
 
   const guidelineBox = React.createElement(
@@ -469,20 +499,52 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
     React.createElement(Text, { style: styles.guidelineText }, '60 Minutes break within first 11 Hours moving Time')
   );
 
-  const travelTimeTable = React.createElement(
+  const initialTravelTime =
+    runsheet.startTime && runsheet.firstArrivalTime
+      ? computeTravelTime(runsheet.startTime, runsheet.firstArrivalTime)
+      : '';
+  const finalTravelTime =
+    runsheet.finalDepartTime && runsheet.returnTime
+      ? computeTravelTime(runsheet.finalDepartTime, runsheet.returnTime)
+      : '';
+
+  const travelTimeRow = (label: string, value: string, isLast: boolean) =>
+    React.createElement(
+      View,
+      { style: isLast ? styles.travelTimeLastRow : styles.travelTimeRow },
+      React.createElement(Text, { style: styles.travelTimeLabel }, label),
+      React.createElement(Text, { style: styles.travelTimeValue }, value || '')
+    );
+
+  const leftColumn = React.createElement(
     View,
-    { style: styles.blockTable },
+    { style: styles.travelTimeLeftColumn },
+    travelTimeRow('First Arrival', runsheet.firstArrivalTime || '', false),
+    travelTimeRow('Travel Time (initial)', initialTravelTime || '', false),
+    travelTimeRow('Final Depart', runsheet.finalDepartTime || '', false),
+    travelTimeRow('Return Time', runsheet.returnTime || '', false),
+    travelTimeRow('Travel Time (final)', finalTravelTime || '', true)
+  );
+
+  const rightColumn = React.createElement(
+    View,
+    { style: styles.travelTimeColumn },
+    travelTimeRow('Depot End Location', runsheet.depotEndLocation || '', false),
+    travelTimeRow('ODOMETER START', formatNumber(runsheet.odometerStart), false),
+    travelTimeRow('ODOMETER FINISH', formatNumber(runsheet.odometerFinish), false),
+    travelTimeRow('TOTAL DISTANCE', formatNumber(runsheet.totalDistance), true)
+  );
+
+  const travelTimeGrid = React.createElement(
+    View,
+    { style: styles.travelTimeContainer },
     React.createElement(Text, { style: styles.blockHeader }, 'Travel Time Details'),
-    breakRow('First Arrival', runsheet.firstArrivalTime || ''),
-    breakRow('Travel Time', runsheet.travelTimeDuration || ''),
-    breakRow('Final Depart', runsheet.finalDepartTime || ''),
-    breakRow('Last End Time', runsheet.lastEndTime || ''),
-    breakRow('Return Time', runsheet.returnTime || ''),
-    breakRow('End Time', runsheet.endTime || ''),
-    breakRow('Depot End Location', runsheet.depotEndLocation || ''),
-    breakRow('ODOMETER START', formatNumber(runsheet.odometerStart)),
-    breakRow('ODOMETER FINISH', formatNumber(runsheet.odometerFinish)),
-    breakRow('TOTAL DISTANCE', formatNumber(runsheet.totalDistance))
+    React.createElement(
+      View,
+      { style: styles.travelTimeBody },
+      leftColumn,
+      rightColumn
+    )
   );
 
   const contractorCell = (label: string, value: string, isLastRow = false) =>
@@ -543,7 +605,7 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       React.createElement(View, { style: { marginTop: 6 } }, breakDetailsTable),
       React.createElement(View, { style: { marginTop: 4 } }, guidelineBox),
       React.createElement(View, { style: { marginTop: 6 } }, contractorGrid),
-      React.createElement(View, { style: { marginTop: 6 } }, travelTimeTable),
+      travelTimeGrid,
       signatureRow,
       commentsBox
     )
