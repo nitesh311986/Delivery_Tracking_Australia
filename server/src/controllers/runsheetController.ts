@@ -2,7 +2,7 @@ import type { NextFunction, Response } from 'express';
 import { Prisma, ShiftStatus, Role } from '@prisma/client';
 import { prisma, runsheetInclude } from '../lib/prisma.js';
 import type { CustomRequest } from '../types/express.js';
-import { computeBreakEndTime, computeTravelTime } from '../utils/timeCalculations.js';
+import { computeTravelTime } from '../utils/timeCalculations.js';
 import {
   createRunsheetSchema,
   createLegSchema,
@@ -259,43 +259,32 @@ export const completeRunsheet = async (req: CustomRequest, res: Response<unknown
     const finish = new Prisma.Decimal(data.odometerFinish);
     const totalDistance = finish.minus(runsheet.odometerStart);
 
-    const breakEndTime = (start: string | undefined, duration: number | undefined) =>
-      start && duration ? computeBreakEndTime(start, duration) : null;
-
     const firstArrivalTime = data.firstArrivalTime || null;
+    const finalDepartTime = data.finalDepartTime || null;
+    const returnTime = data.returnTime || null;
     const travelTimeDuration =
       data.travelTimeDuration ||
-      (firstArrivalTime && runsheet.startTime ? computeTravelTime(runsheet.startTime, firstArrivalTime) : null);
+      (finalDepartTime && returnTime ? computeTravelTime(finalDepartTime, returnTime) : null);
 
     const completed = await prisma.runsheet.update({
       where: { id },
       data: {
         odometerFinish: finish,
-        endTime: data.endTime,
+        totalDistance,
         depotEndLocation: data.depotEndLocation,
 
-        break1StartTime: data.break1StartTime || null,
-        break1Duration: data.break1Duration ?? null,
-        break1EndTime: data.break1EndTime || breakEndTime(data.break1StartTime, data.break1Duration),
-        break2StartTime: data.break2StartTime || null,
-        break2Duration: data.break2Duration ?? null,
-        break2EndTime: data.break2EndTime || breakEndTime(data.break2StartTime, data.break2Duration),
-        break3StartTime: data.break3StartTime || null,
-        break3Duration: data.break3Duration ?? null,
-        break3EndTime: data.break3EndTime || breakEndTime(data.break3StartTime, data.break3Duration),
-        break4StartTime: data.break4StartTime || null,
-        break4Duration: data.break4Duration ?? null,
-        break4EndTime: data.break4EndTime || breakEndTime(data.break4StartTime, data.break4Duration),
+        break1: data.break1 || null,
+        break2: data.break2 || null,
+        break3: data.break3 || null,
+        break4: data.break4 || null,
 
         firstArrivalTime,
         travelTimeDuration,
-        finalDepartTime: data.finalDepartTime || null,
-        lastEndTime: data.lastEndTime || null,
-        returnTime: data.returnTime || data.lastEndTime || null,
+        finalDepartTime,
+        returnTime,
 
         comments: data.comments ?? null,
         signatureUrl: data.signatureUrl,
-        totalDistance,
         status: ShiftStatus.COMPLETED,
         originYard: data.yardLocation,
         yardLocation: data.yardLocation,

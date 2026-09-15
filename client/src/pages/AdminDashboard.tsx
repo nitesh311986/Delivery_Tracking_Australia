@@ -58,30 +58,41 @@ function csvRow(values: unknown[]): string {
 
 function downloadRunsheetCsv(runsheet: Runsheet): void {
   const legs = runsheet.legs ?? [];
-  const tolls = legs.reduce((sum, l) => sum + Number(l.tollAmount ?? 0), 0);
   const headers = [
-    'Runsheet ID',
-    'Driver',
-    'Shift Date',
-    'Origin Yard',
-    'Odometer Start',
-    'Odometer Finish',
-    'Total Distance',
-    'Legs',
-    'Toll Expenses',
+    '#',
+    'Type',
+    'Collection Company',
+    'Collection Suburb',
+    'Delivery Company',
+    'Delivery Suburb',
+    'Arrival Time',
+    'Depart Time',
+    'Toll Used',
+    'Toll Amount',
+    'Toll Authorized By',
+    'No. Items',
+    'Description',
+    'Authorised Person',
+    'Notes',
   ];
-  const row = [
-    runsheet.id,
-    runsheet.driver?.fullName ?? '',
-    formatDate(runsheet.shiftDate),
-    runsheet.originYard,
-    Number(runsheet.odometerStart ?? 0).toFixed(2),
-    runsheet.odometerFinish ? Number(runsheet.odometerFinish).toFixed(2) : '',
-    runsheet.totalDistance ? Number(runsheet.totalDistance).toFixed(2) : '',
-    legs.length,
-    tolls.toFixed(2),
-  ];
-  const csv = [csvRow(headers), csvRow(row)].join('\n');
+  const rows = legs.map((leg, idx) => [
+    String(leg.legOrder + 1),
+    leg.type,
+    leg.collectionCompany ?? '',
+    leg.collectionSuburb ?? '',
+    leg.deliveryCompany ?? '',
+    leg.deliverySuburb ?? '',
+    leg.arrivalTime,
+    leg.departureTime,
+    leg.tollUsed ? 'Y' : 'N',
+    leg.tollAmount ? Number(leg.tollAmount).toFixed(2) : '',
+    leg.tollAuthorizedBy ?? '',
+    String(leg.itemCount),
+    leg.itemDescription ?? '',
+    leg.authorisedPerson ?? '',
+    leg.notes?.trim() || '---',
+  ]);
+  const csv = [csvRow(headers), ...rows.map(csvRow)].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

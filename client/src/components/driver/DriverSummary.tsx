@@ -77,7 +77,7 @@ export default function DriverSummary({ shift, legs, summary }: DriverSummaryPro
           icon={Route}
         />
         <SummaryCard label="Start Time" value={shift.startTime || '—'} icon={Timer} />
-        <SummaryCard label="End Time" value={summary.endTime || '—'} icon={Timer} />
+        <SummaryCard label="Return Time" value={summary.returnTime || '—'} icon={Timer} />
         <SummaryCard label="Yard / Base" value={summary.yardLocation || '—'} icon={MapPin} />
         <SummaryCard label="Depot End" value={summary.depotEndLocation || '—'} icon={MapPin} />
       </div>

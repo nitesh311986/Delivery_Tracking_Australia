@@ -17,59 +17,54 @@ export default function TravelTimeDetails({
   startTime,
   onChange,
 }: TravelTimeDetailsProps) {
-  const [overrideFirst, setOverrideFirst] = useState(() => {
-    const first = [...legs]
-      .sort((a, b) => a.legOrder - b.legOrder)[0]?.arrivalTime;
-    return Boolean(value.firstArrivalTime && value.firstArrivalTime !== first);
-  });
-
   const sorted = useMemo(() => [...legs].sort((a, b) => a.legOrder - b.legOrder), [legs]);
   const legFirstArrival = sorted[0]?.arrivalTime;
   const legFinalDepart = sorted[sorted.length - 1]?.departureTime;
 
-  const firstArrival = overrideFirst ? value.firstArrivalTime ?? '' : legFirstArrival ?? '';
+  const [overrideFirst, setOverrideFirst] = useState(() => {
+    return Boolean(value.firstArrivalTime && value.firstArrivalTime !== legFirstArrival);
+  });
+
+  const firstArrival = (overrideFirst ? value.firstArrivalTime : legFirstArrival) ?? '';
   const finalDepart = legFinalDepart ?? '';
+
+  const initialTravel = useMemo(
+    () => (startTime && firstArrival ? computeTravelTime(startTime, firstArrival) ?? '' : ''),
+    [startTime, firstArrival]
+  );
+
+  const finalTravel = useMemo(
+    () => (finalDepart && value.returnTime ? computeTravelTime(finalDepart, value.returnTime) ?? '' : ''),
+    [finalDepart, value.returnTime]
+  );
 
   useEffect(() => {
     const next: Partial<CompleteRunsheetRequest> = {};
 
-    const desiredFirst = (overrideFirst ? value.firstArrivalTime : legFirstArrival) ?? '';
+    const desiredFirst = firstArrival;
     if (desiredFirst !== value.firstArrivalTime) {
       next.firstArrivalTime = desiredFirst;
     }
 
-    if (desiredFirst && startTime) {
-      const travel = computeTravelTime(startTime, desiredFirst);
-      const nextTravel = travel ?? '';
-      if (nextTravel !== value.travelTimeDuration) {
-        next.travelTimeDuration = nextTravel;
-      }
-    } else if (value.travelTimeDuration !== undefined && value.travelTimeDuration !== '') {
-      next.travelTimeDuration = '';
+    const desiredFinal = finalDepart;
+    if (desiredFinal !== value.finalDepartTime) {
+      next.finalDepartTime = desiredFinal;
     }
 
-    const nextFinalDepart = legFinalDepart ?? '';
-    if (nextFinalDepart !== value.finalDepartTime) {
-      next.finalDepartTime = nextFinalDepart;
-    }
-
-    if (value.lastEndTime && !value.returnTime) {
-      next.returnTime = value.lastEndTime;
+    if (finalTravel !== value.travelTimeDuration) {
+      next.travelTimeDuration = finalTravel;
     }
 
     if (Object.keys(next).length > 0) {
       onChange(next);
     }
   }, [
-    legFirstArrival,
-    legFinalDepart,
-    startTime,
-    overrideFirst,
+    firstArrival,
+    finalDepart,
     value.firstArrivalTime,
-    value.travelTimeDuration,
     value.finalDepartTime,
-    value.lastEndTime,
     value.returnTime,
+    value.travelTimeDuration,
     onChange,
   ]);
 
@@ -119,7 +114,7 @@ export default function TravelTimeDetails({
           />
         </div>
 
-        <Stat label="Travel Time" value={value.travelTimeDuration ?? '—'} />
+        <Stat label="Travel Time (initial)" value={initialTravel || '—'} />
 
         <div className="flex flex-col gap-1.5">
           <label className={ui.label}>Final Depart Time</label>
@@ -128,16 +123,6 @@ export default function TravelTimeDetails({
             value={finalDepart}
             readOnly
             className={`${ui.input} cursor-not-allowed opacity-70`}
-          />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className={ui.label}>Last End Time</label>
-          <input
-            type="time"
-            value={value.lastEndTime ?? ''}
-            onChange={(e) => update('lastEndTime', e.target.value)}
-            className={ui.input}
           />
         </div>
 
@@ -153,6 +138,8 @@ export default function TravelTimeDetails({
             Driver end-of-day clock-out timestamp
           </p>
         </div>
+
+        <Stat label="Travel Time (final)" value={finalTravel || '—'} />
       </div>
     </section>
   );
