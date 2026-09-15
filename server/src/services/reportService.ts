@@ -281,7 +281,7 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       textTransform: 'uppercase',
       textDecoration: 'underline',
     },
-    table: { width: '100%', borderWidth: 1, borderColor: '#000000' },
+    table: { width: '100%', borderWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
     tr: { flexDirection: 'row' },
     th: {
       fontFamily: 'Helvetica-Bold',
@@ -290,8 +290,10 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       borderRightWidth: 1,
       borderBottomWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       paddingVertical: 3,
       paddingHorizontal: 1,
+      minHeight: 18,
     },
     td: {
       fontSize: 7,
@@ -299,18 +301,21 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       borderRightWidth: 1,
       borderBottomWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       paddingVertical: 3,
       paddingHorizontal: 1,
-      minHeight: 14,
+      minHeight: 18,
     },
     tdLast: { borderRightWidth: 0 },
-    blockTable: { width: '100%', borderWidth: 1, borderColor: '#000000' },
+    tdLastRow: { borderBottomWidth: 0 },
+    blockTable: { width: '100%', borderWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
     blockHeader: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 8,
       textAlign: 'center',
       borderBottomWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       paddingVertical: 3,
     },
     labelCell: {
@@ -319,73 +324,78 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
       borderRightWidth: 1,
       borderBottomWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       paddingVertical: 3,
       paddingHorizontal: 3,
       width: '45%',
+      minHeight: 18,
     },
     valueCell: {
       fontSize: 7,
       borderBottomWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       paddingVertical: 3,
       paddingHorizontal: 3,
       width: '55%',
-      minHeight: 14,
+      minHeight: 18,
     },
     guidelineBox: {
+      width: '100%',
       borderWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       padding: 4,
       marginTop: 4,
     },
     guidelineTitle: { fontFamily: 'Helvetica-Bold', fontSize: 7, marginBottom: 2 },
     guidelineText: { fontSize: 7, marginBottom: 1 },
-    contractorGrid: { flexDirection: 'row', flexWrap: 'wrap', borderWidth: 1, borderColor: '#000000', marginTop: 6 },
-    contractorCell: { width: '50%', flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000000' },
+    contractorGrid: { width: '100%', borderWidth: 1, borderColor: '#000000', borderStyle: 'solid', marginTop: 6 },
+    contractorRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
+    contractorRowLast: { flexDirection: 'row' },
+    contractorCell: { width: '50%', borderRightWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
+    contractorCellLast: { width: '50%' },
+    contractorInner: { flexDirection: 'row', paddingVertical: 3, paddingHorizontal: 3, minHeight: 18 },
     contractorLabel: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 7,
       width: '45%',
-      borderRightWidth: 1,
-      borderColor: '#000000',
-      paddingVertical: 3,
-      paddingHorizontal: 3,
     },
-    contractorValue: { fontSize: 7, width: '55%', paddingVertical: 3, paddingHorizontal: 3 },
-    sigRow: { flexDirection: 'row', borderWidth: 1, borderTopWidth: 0, borderColor: '#000000' },
-    sigCell: { width: '50%', borderRightWidth: 1, borderColor: '#000000', padding: 4, minHeight: 55 },
+    contractorValue: { fontSize: 7, width: '55%' },
+    sigRow: { width: '100%', flexDirection: 'row', borderWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
+    sigCell: { width: '50%', borderRightWidth: 1, borderColor: '#000000', borderStyle: 'solid', padding: 4, minHeight: 55 },
     dateCell: { width: '50%', padding: 4 },
     sigLabel: { fontFamily: 'Helvetica-Bold', fontSize: 8, marginBottom: 2 },
     signature: { width: 140, height: 45 },
     signaturePlaceholder: { fontSize: 7, color: '#444444', fontStyle: 'italic' },
-    commentBox: { borderWidth: 1, borderTopWidth: 0, borderColor: '#000000', padding: 4, minHeight: 45 },
+    commentBox: { width: '100%', borderWidth: 1, borderTopWidth: 0, borderColor: '#000000', borderStyle: 'solid', padding: 4, minHeight: 45 },
     commentLabel: { fontFamily: 'Helvetica-Bold', fontSize: 8, marginBottom: 2 },
     commentText: { fontSize: 8 },
     travelTimeContainer: {
+      width: '100%',
       borderWidth: 1,
       borderColor: '#000000',
+      borderStyle: 'solid',
       marginTop: 12,
       marginBottom: 12,
-      marginHorizontal: 8,
     },
     travelTimeBody: { flexDirection: 'row' },
     travelTimeColumn: { width: '50%' },
-    travelTimeLeftColumn: { width: '50%', borderRightWidth: 1, borderColor: '#000000' },
-    travelTimeRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000000' },
-    travelTimeLastRow: { flexDirection: 'row' },
+    travelTimeLeftColumn: { width: '50%', borderRightWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
+    travelTimeRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000000', borderStyle: 'solid' },
+    travelTimeLastRow: { flexDirection: 'row', borderBottomWidth: 0 },
     travelTimeLabel: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 8,
-      borderRightWidth: 1,
-      borderColor: '#000000',
       padding: 4,
       width: '45%',
+      minHeight: 18,
     },
     travelTimeValue: {
       fontSize: 8,
       padding: 4,
       width: '55%',
-      minHeight: 14,
+      minHeight: 18,
     },
   });
 
@@ -419,6 +429,7 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
 
   const legs: any[] = runsheet.legs || [];
   const rowCount = Math.max(legs.length, 8);
+  const isLastRow = (idx: number) => idx === rowCount - 1;
   const legRows = Array.from({ length: rowCount }, (_, idx) => {
     const leg = legs[idx];
     const values = leg
@@ -444,7 +455,12 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
           Text,
           {
             key: colIdx,
-            style: [styles.td, { width: columns[colIdx].width }, colIdx === lastCol ? styles.tdLast : {}],
+            style: [
+              styles.td,
+              { width: columns[colIdx].width },
+              colIdx === lastCol ? styles.tdLast : {},
+              isLastRow(idx) ? styles.tdLastRow : {},
+            ],
           },
           value
         )
@@ -454,12 +470,20 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
 
   const sigImage = prepareSignatureImage(runsheet.signatureUrl);
 
-  const breakRow = (label: string, value: string) =>
+  const breakRow = (label: string, value: string, isLast = false) =>
     React.createElement(
       View,
       { style: styles.tr, key: label },
-      React.createElement(Text, { style: styles.labelCell }, label),
-      React.createElement(Text, { style: styles.valueCell }, value || '')
+      React.createElement(
+        Text,
+        { style: [styles.labelCell, isLast ? { borderBottomWidth: 0 } : {}] },
+        label
+      ),
+      React.createElement(
+        Text,
+        { style: [styles.valueCell, isLast ? { borderBottomWidth: 0 } : {}] },
+        value || ''
+      )
     );
 
   const parseBreakSlot = (raw: string | undefined | null): { startTime?: string; duration?: number; endTime?: string } | null => {
@@ -487,7 +511,7 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
     breakRow('First Break', formatBreakSlot(runsheet.break1)),
     breakRow('Second Break', formatBreakSlot(runsheet.break2)),
     breakRow('Third Break', formatBreakSlot(runsheet.break3)),
-    breakRow('Fourth Break', formatBreakSlot(runsheet.break4))
+    breakRow('Fourth Break', formatBreakSlot(runsheet.break4), true)
   );
 
   const guidelineBox = React.createElement(
@@ -547,21 +571,36 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
     )
   );
 
-  const contractorCell = (label: string, value: string, isLastRow = false) =>
+  const contractorRow = (cells: React.ReactNode[], isLastRow = false) =>
     React.createElement(
       View,
-      { style: [styles.contractorCell, isLastRow ? { borderBottomWidth: 0 } : {}], key: label },
-      React.createElement(Text, { style: styles.contractorLabel }, label),
-      React.createElement(Text, { style: styles.contractorValue }, value || '')
+      { style: isLastRow ? styles.contractorRowLast : styles.contractorRow },
+      ...cells
+    );
+
+  const contractorCell = (label: string, value: string, isLastCol = false) =>
+    React.createElement(
+      View,
+      { style: isLastCol ? styles.contractorCellLast : styles.contractorCell, key: label },
+      React.createElement(
+        View,
+        { style: styles.contractorInner },
+        React.createElement(Text, { style: styles.contractorLabel }, label),
+        React.createElement(Text, { style: styles.contractorValue }, value || '')
+      )
     );
 
   const contractorGrid = React.createElement(
     View,
     { style: styles.contractorGrid },
-    contractorCell('Sub-Contractor Name', runsheet.subcontractorName || runsheet.driver?.subcontractorName || runsheet.driver?.fullName || ''),
-    contractorCell('Rego', runsheet.rego || runsheet.driver?.rego || ''),
-    contractorCell('Your Business Name', runsheet.businessName || runsheet.driver?.businessName || '', true),
-    contractorCell('Yard/Base Location', runsheet.yardLocation || runsheet.driver?.yardLocation || runsheet.originYard || '', true)
+    contractorRow([
+      contractorCell('Sub-Contractor Name', runsheet.subcontractorName || runsheet.driver?.subcontractorName || runsheet.driver?.fullName || ''),
+      contractorCell('Rego', runsheet.rego || runsheet.driver?.rego || '', true),
+    ]),
+    contractorRow([
+      contractorCell('Your Business Name', runsheet.businessName || runsheet.driver?.businessName || ''),
+      contractorCell('Yard/Base Location', runsheet.yardLocation || runsheet.driver?.yardLocation || runsheet.originYard || '', true),
+    ], true)
   );
 
   const signatureRow = React.createElement(

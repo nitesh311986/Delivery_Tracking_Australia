@@ -7,12 +7,14 @@ import { computeTravelTime } from '../../utils/timeCalculations';
 interface TravelTimeDetailsProps {
   value: CompleteRunsheetRequest;
   legs: RunsheetLegItem[];
+  startTime: string;
   onChange: (next: Partial<CompleteRunsheetRequest>) => void;
 }
 
 export default function TravelTimeDetails({
   value,
   legs,
+  startTime,
   onChange,
 }: TravelTimeDetailsProps) {
   const sorted = useMemo(() => [...legs].sort((a, b) => a.legOrder - b.legOrder), [legs]);
@@ -25,6 +27,16 @@ export default function TravelTimeDetails({
 
   const firstArrival = (overrideFirst ? value.firstArrivalTime : legFirstArrival) ?? '';
   const finalDepart = legFinalDepart ?? '';
+
+  const initialTravel = useMemo(
+    () => (startTime && firstArrival ? computeTravelTime(startTime, firstArrival) ?? '' : ''),
+    [startTime, firstArrival]
+  );
+
+  const finalTravel = useMemo(
+    () => (finalDepart && value.returnTime ? computeTravelTime(finalDepart, value.returnTime) ?? '' : ''),
+    [finalDepart, value.returnTime]
+  );
 
   useEffect(() => {
     const next: Partial<CompleteRunsheetRequest> = {};
@@ -39,12 +51,8 @@ export default function TravelTimeDetails({
       next.finalDepartTime = desiredFinal;
     }
 
-    const travel =
-      finalDepart && value.returnTime
-        ? computeTravelTime(finalDepart, value.returnTime) ?? ''
-        : '';
-    if (travel !== value.travelTimeDuration) {
-      next.travelTimeDuration = travel;
+    if (finalTravel !== value.travelTimeDuration) {
+      next.travelTimeDuration = finalTravel;
     }
 
     if (Object.keys(next).length > 0) {
@@ -106,7 +114,7 @@ export default function TravelTimeDetails({
           />
         </div>
 
-        <Stat label="Travel Time" value={value.travelTimeDuration ?? '—'} />
+        <Stat label="Travel Time (initial)" value={initialTravel || '—'} />
 
         <div className="flex flex-col gap-1.5">
           <label className={ui.label}>Final Depart Time</label>
@@ -130,6 +138,8 @@ export default function TravelTimeDetails({
             Driver end-of-day clock-out timestamp
           </p>
         </div>
+
+        <Stat label="Travel Time (final)" value={finalTravel || '—'} />
       </div>
     </section>
   );

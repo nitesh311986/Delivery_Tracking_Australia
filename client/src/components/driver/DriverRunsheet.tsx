@@ -366,6 +366,7 @@ export default function DriverRunsheet() {
               <TravelTimeDetails
                 value={summary}
                 legs={legs}
+                startTime={shift.startTime}
                 onChange={(next) => setSummary((prev) => ({ ...prev, ...next }))}
               />
               <ShiftSummary
