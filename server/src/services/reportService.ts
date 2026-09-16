@@ -543,6 +543,7 @@ export async function generateRunsheetPdf(runsheet: any): Promise<Buffer> {
   const leftColumn = React.createElement(
     View,
     { style: styles.travelTimeLeftColumn },
+    travelTimeRow('Start Time', runsheet.startTime || '', false),
     travelTimeRow('First Arrival', runsheet.firstArrivalTime || '', false),
     travelTimeRow('Travel Time (initial)', initialTravelTime || '', false),
     travelTimeRow('Final Depart', runsheet.finalDepartTime || '', false),
